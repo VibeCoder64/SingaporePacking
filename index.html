@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Singapore Relocation — Packing Planner</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f4f0;color:#1a1a18;line-height:1.5;font-size:14px}
+h1{font-size:22px;font-weight:600;color:#1a1a18;padding:24px 24px 4px}
+.subtitle{font-size:13px;color:#666;padding:0 24px 20px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.status{display:inline-flex;align-items:center;gap:5px;font-size:12px;padding:3px 10px;border-radius:20px;border:1px solid #e0dfd9;background:#fff}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dot.green{background:#059669}.dot.amber{background:#d97706;animation:pulse 1s infinite}.dot.red{background:#dc2626}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.tabs{display:flex;gap:6px;padding:0 24px 16px;flex-wrap:wrap}
+.tab{padding:7px 16px;border-radius:20px;border:1px solid #d0cfc9;font-size:13px;cursor:pointer;background:#fff;color:#555;transition:all .15s;font-weight:500}
+.tab.active{background:#1a1a18;color:#fff;border-color:#1a1a18}
+.panel{display:none;padding:0 24px 32px}.panel.active{display:block}
+.trip-note{background:#fff;border:1px solid #e0dfd9;border-radius:10px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:#444;line-height:1.6}
+.trip-note strong{color:#1a1a18}
+.warn{background:#fffbeb;border:1px solid #fcd34d;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:#78350f;line-height:1.6}
+.warn strong{color:#78350f}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.08em;color:#888;text-transform:uppercase;margin:20px 0 8px;display:flex;align-items:center;justify-content:space-between}
+.kg-chip{font-size:11px;font-weight:600;color:#aaa;letter-spacing:0}
+.bag{background:#fff;border:1px solid #e5e4de;border-radius:12px;padding:16px;margin-bottom:12px}
+.bag-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
+.bag-title{font-size:14px;font-weight:600;color:#1a1a18}
+.badge{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:600;white-space:nowrap}
+.b-blue{background:#dbeafe;color:#1e40af}.b-green{background:#dcfce7;color:#166534}
+.b-purple{background:#ede9fe;color:#4c1d95}.b-red{background:#fee2e2;color:#991b1b}
+.b-gray{background:#f3f4f6;color:#374151}
+.items{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+@media(max-width:500px){.items{grid-template-columns:1fr}}
+.item{display:flex;align-items:flex-start;gap:8px;padding:6px 8px;border-radius:7px;cursor:pointer;transition:background .1s;-webkit-user-select:none;user-select:none}
+.item:hover{background:#f5f4f0}
+.item.done .label{text-decoration:line-through;color:#aaa}
+.cb{width:16px;height:16px;min-width:16px;border:1.5px solid #ccc;border-radius:4px;display:flex;align-items:center;justify-content:center;margin-top:1px;transition:all .15s}
+.item.done .cb{background:#059669;border-color:#059669}
+.ck{display:none;width:9px;height:9px}.item.done .ck{display:block}
+.label{font-size:13px;color:#333;line-height:1.4}
+.crit{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;background:#fee2e2;color:#b91c1c;margin-left:5px;font-weight:700;vertical-align:middle}
+.bag-note{font-size:12px;color:#666;background:#f8f7f3;border-radius:7px;padding:8px 10px;margin-top:10px;line-height:1.5}
+.tip{font-size:12px;color:#065f46;background:#d1fae5;border-radius:7px;padding:8px 10px;margin-top:8px;line-height:1.5}
+.tip::before{content:"Tip: ";font-weight:700}
+.progress{margin-top:16px}
+.prog-bar{height:5px;background:#e5e4de;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:#059669;border-radius:3px;transition:width .3s}
+.prog-text{font-size:12px;color:#888;margin-top:5px}
+.budget-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+@media(max-width:500px){.budget-grid{grid-template-columns:1fr}}
+.bcard{background:#fff;border:1px solid #e5e4de;border-radius:10px;padding:12px 14px}
+.bcard-label{font-size:11px;font-weight:700;color:#888;letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px}
+.bcard-val{font-size:22px;font-weight:700;color:#1a1a18}
+.bcard-sub{font-size:11px;color:#aaa;margin-top:2px}
+.stream-card{background:#fff;border:1px solid #e5e4de;border-radius:12px;padding:16px;margin-bottom:12px}
+.stream-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.stream-icon{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;min-width:32px}
+.stream-title{font-size:14px;font-weight:600;color:#1a1a18}
+.stream-when{font-size:12px;color:#888}
+.action-list{list-style:none;padding:0}
+.action-list li{font-size:13px;color:#444;padding:3px 0 3px 14px;position:relative;line-height:1.5}
+.action-list li::before{content:"›";position:absolute;left:2px;color:#aaa;font-weight:700}
+.col2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.col2{grid-template-columns:1fr}}
+.no-go-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+@media(max-width:500px){.no-go-grid{grid-template-columns:1fr}}
+.no-go-card{background:#fff;border:1px solid #fecaca;border-radius:10px;padding:12px 14px}
+.no-go-card h4{font-size:13px;font-weight:600;color:#dc2626;margin-bottom:4px}
+.no-go-card p{font-size:12px;color:#666;line-height:1.5}
+.reset-btn{font-size:11px;padding:3px 12px;border-radius:20px;border:1px solid #ccc;background:#fff;cursor:pointer;color:#888}
+.add-trigger{font-size:12px;color:#bbb;cursor:pointer;padding:5px 8px;border-radius:7px;border:1.5px dashed #e0dfd9;background:none;width:100%;text-align:left;margin-top:4px;transition:all .15s;display:block}
+.add-trigger:hover{color:#059669;border-color:#a7f3d0;background:#f0fdf4}
+.add-input-row{display:none;gap:6px;align-items:center;margin-top:6px}
+.add-input-row.visible{display:flex}
+.add-input{flex:1;font-size:13px;padding:6px 10px;border-radius:7px;border:1px solid #d0cfc9;outline:none;background:#fff;color:#1a1a18}
+.add-input:focus{border-color:#059669;box-shadow:0 0 0 2px #d1fae5}
+.add-confirm{font-size:12px;padding:6px 12px;border-radius:7px;border:none;background:#059669;color:#fff;cursor:pointer;white-space:nowrap;font-weight:500}
+.add-cancel{font-size:12px;padding:6px 10px;border-radius:7px;border:1px solid #e0dfd9;background:#fff;color:#888;cursor:pointer}
+.item.custom{position:relative}
+.del-btn{opacity:0;position:absolute;right:2px;top:50%;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;background:#fee2e2;border:none;cursor:pointer;font-size:11px;color:#dc2626;line-height:1;transition:opacity .15s;padding:0;display:flex;align-items:center;justify-content:center}
+.item.custom:hover .del-btn{opacity:1}
+</style>
+</head>
+<body>
+
+<h1>Singapore Relocation — Packing Planner</h1>
+<div class="subtitle">
+  Three windows · all belongings mapped · changes sync in real-time
+  <span class="status" id="status"><span class="dot amber" id="statusdot"></span><span id="statustext">Connecting…</span></span>
+  <button class="reset-btn" onclick="resetAll()">Reset all</button>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="go('t1')">✈ Flight 1 — 29 Apr (46 kg)</button>
+  <button class="tab" onclick="go('t2')">✈ Flight 2 — 3 May (23 kg)</button>
+  <button class="tab" onclick="go('t3')">📦 Air Freight — 100 kg</button>
+  <button class="tab" onclick="go('t4')">🚫 Leave / Buy in SG</button>
+  <button class="tab" onclick="go('t5')">📋 Workstreams</button>
+</div>
+
+<!-- FLIGHT 1 -->
+<div id="t1" class="panel active">
+  <div class="trip-note"><strong>Wed 29 Apr → Faber Hotel → drop bags at service apt 1 May → wife flies back Sat 2 May.</strong> Hotel-based scouting trip, but use the 1 May service apt access to pre-position items — so your 3 May solo flight isn't overloaded. Each of you: 23 kg checked + carry-on. Target ≤19 kg checked each; leave buffer for anything purchased during the trip.</div>
+  <div class="section-label">His carry-on <span class="kg-chip">critical docs + high-value electronics</span></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Critical documents</span><span class="badge b-red">Carry-on — never checked</span></div><div class="items" id="d_t1_docs"></div></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Personal electronics</span><span class="badge b-purple">Carry-on ~2.5 kg</span></div><div class="items" id="d_t1_electronics"></div><div class="bag-note">ROG Ally X, Switch OLED, and iPad Mini are high-value fragile items — never in checked baggage. Drop at service apartment on 1 May to free up your bag for the return to PNH.</div></div>
+  <div class="section-label">His checked bag <span class="kg-chip">target ≤19 kg</span></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Clothing — 4 days hotel stay</span><span class="badge b-blue">~4 kg</span></div><div class="items" id="d_t1_hisclothes"></div></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Pre-position items — drop at service apt 1 May</span><span class="badge b-blue">~8 kg</span></div><div class="items" id="d_t1_prepos"></div><div class="bag-note">Pack these in a dedicated inner bag or packing cube — they don't come out at the hotel, only at the service apartment on 1 May.</div></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Scouting prep</span><span class="badge b-gray">~0.3 kg</span></div><div class="items" id="d_t1_prep"></div><div class="bag-note">Thu 30 Apr: Invictus Dempsey Hill (10am), ISS (1pm), Knightsbridge (4pm), Boon Tiong + Depot Rd viewings. Fri 1 May: 6A Boon Tiong, D'Hillside Loft, 110A Depot, 95A Henderson. Pack a folder + pen for every viewing.</div></div>
+  <div class="section-label">Wife's carry-on <span class="kg-chip">school admission docs</span></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">School documents</span><span class="badge b-red">Carry-on — never checked</span></div><div class="items" id="d_t1_schooldocs"></div><div class="bag-note">Bring originals + 2 photocopies each. Admissions offices assess year level placement at the visit itself.</div></div>
+  <div class="section-label">Wife's checked bag <span class="kg-chip">target ≤19 kg</span></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Clothing — 4 days</span><span class="badge b-blue">~6 kg</span></div><div class="items" id="d_t1_herclothes"></div></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Shared toiletries</span><span class="badge b-blue">~2 kg</span></div><div class="items" id="d_t1_toiletries"></div></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Pre-position items — drop at service apt 1 May (her bag)</span><span class="badge b-blue">~8 kg</span></div><div class="items" id="d_t1_herprepos"></div><div class="bag-note">She flies back 2 May — these stay in the service apartment with you.</div></div>
+  <div class="progress"><div class="prog-bar"><div class="prog-fill" id="p1fill" style="width:0%"></div></div><div class="prog-text" id="p1text">0 of 0 ticked off</div></div>
+</div>
+
+<!-- FLIGHT 2 -->
+<div id="t2" class="panel">
+  <div class="trip-note"><strong>Sun 3 May — solo, 23 kg checked + carry-on.</strong> Moving into the studio service apartment. Work starts Monday 4 May morning. Electronics and books are already pre-positioned — this bag is almost entirely work wardrobe and studio life. Target ≤20 kg checked; keep 3 kg buffer.</div>
+  <div class="section-label">Carry-on <span class="kg-chip">work tech — never checked</span></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Laptop + work kit</span><span class="badge b-red">Carry-on</span></div><div class="items" id="d_t2_tech"></div></div>
+  <div class="section-label">Checked bag <span class="kg-chip">target ≤20 kg</span></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Work wardrobe — ~10 days supply</span><span class="badge b-green">~8 kg</span></div><div class="items" id="d_t2_workwear"></div><div class="bag-note">Service apartment has a washer. 10 days of outfits → launder twice before air freight arrives.</div></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">3 pairs of shoes</span><span class="badge b-green">~4 kg</span></div><div class="items" id="d_t2_shoes"></div><div class="bag-note">Stuff socks inside shoes to save space. Use shower caps to protect clothes from soles.</div></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Studio life — 1 month supply</span><span class="badge b-green">~4 kg</span></div><div class="items" id="d_t2_studio"></div></div>
+  <div class="bag"><div class="bag-header"><span class="bag-title">Admin + remaining personal items</span><span class="badge b-green">~3 kg</span></div><div class="items" id="d_t2_misc"></div><div class="tip">On arrival at Changi: buy EZ-Link card (MRT/bus), get local SIM (Singtel/StarHub/M1), head to service apartment. Order rice cooker + rice on Lazada for next-day delivery.</div></div>
+  <div class="progress"><div class="prog-bar"><div class="prog-fill" id="p2fill" style="width:0%"></div></div><div class="prog-text" id="p2text">0 of 0 ticked off</div></div>
+</div>
+
+<!-- FREIGHT -->
+<div id="t3" class="panel">
+  <div class="trip-note"><strong>100 kg company air freight — dispatch by Day 14–21 (mid–late May).</strong> Do not ship until lease is signed. With rice, rice cooker, adapters, and bicycle removed, estimated payload is ~78 kg — a comfortable 22 kg buffer. Prioritise family items: wife and child arrive ~2 weeks after you once the Dependant's Pass clears.</div>
+  <div class="warn"><strong>⚠️ Monitors — no original boxes.</strong> Have the 34" and 27" monitors professionally foam-packed by a freight agent in Phnom Penh before dispatch. Bubble wrap alone is not sufficient for a 34" panel in air transit. Budget ~S$30–50. A cracked panel costs far more.</div>
+  <div class="budget-grid">
+    <div class="bcard"><div class="bcard-label">Allowance</div><div class="bcard-val">100 kg</div><div class="bcard-sub">Company-provided air freight</div></div>
+    <div class="bcard"><div class="bcard-label">Est. payload</div><div class="bcard-val">~78 kg</div><div class="bcard-sub">After removing no-go items</div></div>
+    <div class="bcard"><div class="bcard-val" style="color:#059669">~22 kg</div><div class="bcard-label">Buffer</div><div class="bcard-sub">Don't fill to 100 kg</div></div>
+  </div>
+  <div class="col2">
+    <div>
+      <div class="section-label">Monitors + display setup <span class="kg-chip">~17 kg</span></div>
+      <div class="bag"><div class="items" id="d_f_monitors"></div><div class="bag-note">Pack upright, top of box, labelled "FRAGILE — SCREEN" on all four sides.</div></div>
+      <div class="section-label">Wife's clothes + makeup <span class="kg-chip">~27 kg</span></div>
+      <div class="bag"><div class="items" id="d_f_wifeclothes"></div><div class="bag-note">Vacuum compression bags reduce volume by ~50% and protect against moisture in transit.</div></div>
+      <div class="section-label">Son's items <span class="kg-chip">~12 kg</span></div>
+      <div class="bag"><div class="items" id="d_f_son"></div></div>
+    </div>
+    <div>
+      <div class="section-label">Cooking supplies <span class="kg-chip">~5 kg</span></div>
+      <div class="bag"><div class="items" id="d_f_cooking"></div><div class="tip">Cambodian/Khmer sauces and regional spices you can't find in SG are worth every gram. Skip anything at Mustafa Centre or FairPrice.</div></div>
+      <div class="section-label">Books — remaining 5 <span class="kg-chip">~4 kg</span></div>
+      <div class="bag"><div class="items" id="d_f_books"></div><div class="bag-note">5 books go in your 29 Apr carry-on, 5 in the 3 May carry-on. Final 5 here.</div></div>
+      <div class="section-label">Light gym gear <span class="kg-chip">~2 kg</span></div>
+      <div class="bag"><div class="items" id="d_f_gym"></div><div class="bag-note">Leave dumbbells — buy at Decathlon SG or use the free HDB community gym.</div></div>
+      <div class="section-label">Sentimental + comfort <span class="kg-chip">~9 kg</span></div>
+      <div class="bag"><div class="items" id="d_f_senti"></div></div>
+    </div>
+  </div>
+  <div class="warn" style="margin-top:4px"><strong>Bicycle — separate decision required.</strong> Non-folding bike + child seat = oversized, cannot go in company air freight. Options: (1) <strong>Buy in SG — recommended</strong>: Decathlon SG from S$200–350. (2) Sea freight from PNH: ~S$100–200, 2–4 weeks. (3) Ask HR if freight partner accommodates oversized. Confirm bike storage at chosen HDB before signing lease.</div>
+</div>
+
+<!-- LEAVE / BUY IN SG -->
+<div id="t4" class="panel">
+  <div class="trip-note">These items should <strong>not travel with you</strong> — leave in Phnom Penh or buy locally in Singapore. Dropping them recovers ~28 kg of freight capacity.</div>
+  <div class="no-go-grid">
+    <div class="no-go-card"><h4>Rice — 10 kg ❌ Leave behind</h4><p>FairPrice, Sheng Siong, and Mustafa Centre all stock Cambodian jasmine rice. S$15–25 for 10 kg, delivered same day on Lazada.</p></div>
+    <div class="no-go-card"><h4>Rice cooker ❌ Buy in SG</h4><p>Singapore is Type G (UK 3-pin, 230V). A Tiger or Zojirushi on Lazada SG costs S$50–120. Not worth 3.5 kg of freight on a used appliance.</p></div>
+    <div class="no-go-card"><h4>Power adapters (7-hole) ❌ Buy in SG</h4><p>Singapore IS the 3-pin UK standard. Buy a proper SG extension lead on Lazada for S$10–15 — safer, lighter, correct spec.</p></div>
+    <div class="no-go-card"><h4>Bicycle via air freight ❌ Separate action</h4><p>Non-folding + child seat = oversized, cannot go in 100 kg company freight. See Freight tab for your three options.</p></div>
+    <div class="no-go-card"><h4>Heavy gym equipment ❌ Buy in SG</h4><p>Dumbbells, kettlebells = dead weight in freight. Decathlon SG pricing is fair. Many HDB estates have a free community gym.</p></div>
+    <div class="no-go-card"><h4>Large furniture ❌ Buy / source in SG</h4><p>IKEA SG, Lazada, and Carousell SG cover furniture well. Budget S$2,000–3,000 to furnish the HDB. 95A Henderson at $4,500 fully furnished avoids this cost.</p></div>
+  </div>
+  <div class="tip">Mustafa Centre in Little India (open 24/7, 145 Syed Alwi Road) is your first stop in Week 1 — South and Southeast Asian food brands, electronics, household items at prices well below supermarkets.</div>
+</div>
+
+<!-- WORKSTREAMS -->
+<div id="t5" class="panel">
+  <div class="trip-note">Eight parallel workstreams — sequenced by urgency. The first three cascade into everything else.</div>
+  <div id="d_streams"></div>
+</div>
+
+<script>
+const data={
+  t1_docs:[{t:"Passports — yours + wife's",c:1},{t:"EP approval letter + offer letter",c:1},{t:"Marriage certificate — orig + 2 copies",c:1},{t:"Dependant's Pass prep docs",c:1},{t:"Secondment agreement",c:1},{t:"Child's birth certificate — orig + 2 copies",c:1},{t:"MOM documents",c:1}],
+  t1_electronics:[{t:"ROG Ally X + charger"},{t:"Nintendo Switch OLED + case + games"},{t:"iPad Mini 7 + charger"},{t:"AirPods / earphones"},{t:"Power bank"},{t:"HomePod Mini ×2"},{t:"Type G (UK 3-pin) travel adapter ×1"}],
+  t1_hisclothes:[{t:"Smart casual shirts ×3"},{t:"Trousers / chinos ×2"},{t:"Casual T-shirts ×2"},{t:"Underwear ×5 + socks ×5"},{t:"Smart casual shoes for viewings"},{t:"Comfortable sneakers for walking"},{t:"Light jacket — SG aircon is very cold"}],
+  t1_prepos:[{t:"Books ×5 — packed in own inner bag"},{t:"Resistance bands + foam roller + jump rope"},{t:"USB hub + laptop accessories"},{t:"Extra device cables"},{t:"Reusable water bottle"},{t:"Small comfort item / family photo"}],
+  t1_prep:[{t:"Housing viewing checklist (printed)"},{t:"Floor plan comparison notes"},{t:"School shortlist + questions to ask"},{t:"Folder + pen — one per viewing"},{t:"CACS study materials loaded on device"}],
+  t1_schooldocs:[{t:"Child's school transcripts — last 2 yrs",c:1},{t:"Child's birth certificate (copy)",c:1},{t:"Immunisation / vaccination records",c:1},{t:"Child's passport copy"},{t:"Recent passport photo of child"},{t:"Current school reference letter"}],
+  t1_herclothes:[{t:"Smart casual outfits ×3"},{t:"Casual outfits ×2"},{t:"Comfortable walking shoes"},{t:"Underwear + socks ×5"},{t:"Light jacket"},{t:"1 nicer outfit for couple time"}],
+  t1_toiletries:[{t:"Shampoo + conditioner (travel size)"},{t:"Body wash"},{t:"Toothbrushes ×2 + toothpaste"},{t:"Deodorant ×2"},{t:"Face wash + moisturiser"},{t:"Sunscreen SPF 50 — SG UV is very high"},{t:"Paracetamol + basic medicine kit"},{t:"Razors"}],
+  t1_herprepos:[{t:"Books ×5 — packed in own inner bag"},{t:"Son's toilet seat cover"},{t:"Son's comfort toy (1 small item)"},{t:"Favourite cooking spices — batch 1 (~2 kg)"},{t:"Extra toiletries — 1 month supply"},{t:"Laundry bags / mesh bags"}],
+  t2_tech:[{t:"Laptop + charger",c:1},{t:"Notebook + pen — Day 1 meetings",c:1},{t:"Headset for calls"},{t:"Portable hard drive / USB key"},{t:"Mouse + keyboard (if preferred)"},{t:"Remaining books ×5"}],
+  t2_workwear:[{t:"Business shirts ×5–6"},{t:"Trousers ×3"},{t:"Smart blazer ×1"},{t:"Business casual outfits ×3"},{t:"Belt ×2"},{t:"Underwear ×10 + socks ×10"}],
+  t2_shoes:[{t:"Office / formal shoes — 1 pair"},{t:"Running shoes — 1 pair"},{t:"Walking / casual shoes — 1 pair"},{t:"Slippers for apartment"}],
+  t2_studio:[{t:"Full toiletries supply — 1 month"},{t:"Medicine + supplements"},{t:"Instant coffee / tea (first few days)"},{t:"Small first aid kit"},{t:"Cooking spices batch 2 (~1.5 kg)"},{t:"Reusable bags for grocery runs"}],
+  t2_misc:[{t:"Service apartment welcome letter",c:1},{t:"SingPass + bank account prep docs",c:1},{t:"CACS exam registration confirmation"},{t:"Tax equalisation briefing notes"},{t:"Onboarding / HR documents"},{t:"Business cards (if printed)"}],
+  f_monitors:[{t:'34" monitor hybrid — professionally foam-packed'},{t:'27" 4K monitor — professionally foam-packed'},{t:"Monitor arms / mounting hardware"},{t:"HDMI + DisplayPort cables"},{t:"All monitor power cables"}],
+  f_wifeclothes:[{t:"Wife's full clothing wardrobe — vacuum-bagged"},{t:"Wife's makeup + skincare — full kit"},{t:"Wife's remaining shoes"},{t:"Wife's bags + accessories"},{t:"Wife's personal + sentimental items"}],
+  f_son:[{t:"Son's clothing — full wardrobe"},{t:"Son's toys — full selection"},{t:"Son's books + school supplies"},{t:"Son's bedding + comfort blanket"},{t:"Son's passport + document copies"}],
+  f_cooking:[{t:"Cambodian / Khmer sauces + condiments"},{t:"Regional spices unavailable in SG"},{t:"Favourite pantry staples from PNH"},{t:"Food storage containers"},{t:"Personal utensils / cutlery"}],
+  f_books:[{t:"Books ×5 — CACS + CPB reference"},{t:"Additional industry reference books"},{t:"Personal / favourite books"}],
+  f_gym:[{t:"Resistance bands set"},{t:"Foam roller"},{t:"Jump rope"},{t:"Yoga mat (if used regularly)"}],
+  f_senti:[{t:"Framed family photos"},{t:"Favourite personal items"},{t:"Small decorative / home items"},{t:"Child's artwork"},{t:"Anything that makes the HDB feel like home"}],
+};
+
+const streams=[
+  {icon:"DP",bg:"#dbeafe",tc:"#1e40af",name:"Dependant's Pass",when:"Start Day 1–2 on arrival — top priority",actions:["EP must be activated FIRST — DP application depends on it","Docs: EP copy, passport copies (wife + child), marriage cert, birth cert, 2 photos each","Apply via MOM website (mom.gov.sg) — typically 3–5 business days","Book wife + child's one-way flight once DP approved (~2 weeks in)","School enrolment requires DP in hand — start application now, complete once DP clears","DP also unlocks child's school enrolment and wife's ability to work (LOC endorsement)"],tip:"Apply DP on Day 1 or 2. Every day delayed is a day longer your family stays in Phnom Penh. Don't wait for housing to settle first."},
+  {icon:"SC",bg:"#dcfce7",tc:"#166534",name:"School search",when:"Decision by end of 29 Apr trip",actions:["Thu 30 Apr: Invictus Dempsey Hill (10am), ISS International School (1pm), Knightsbridge (4pm)","Rank your top 2 on the flight back — admission spots fill fast at international schools","Apply to 2 schools simultaneously — don't wait for one rejection before applying to another","Invictus Dempsey Hill is closest to the Depot Rd / Boon Tiong homes you're viewing","10-min bike ride from shortlisted HDBs = this area should anchor your home decision","Submit full enrolment application as soon as DP is approved"],tip:"Start the application before DP arrives — get in the queue now, complete enrolment once DP clears."},
+  {icon:"HS",bg:"#fef3c7",tc:"#92400e",name:"Home search",when:"Decision by Day 7–10",actions:["Thu 30 Apr: 10B Boon Tiong ($5,188 negotiable), 113/114 Depot Rd ($4,500). Fri 1 May: 6A Boon Tiong, D'Hillside Loft ($4,700), 110A Depot ($4,600), 95A Henderson ($4,500 fully furnished)","95A Henderson fully furnished = saves the S$2–3k top-up furnishing budget — strong value","Depot Rd cluster + Invictus = 10-min bike ride; factor this into your ranking","Confirm bike storage available in the estate before signing the lease","Sign lease by Day 10 — air freight needs a delivery address to dispatch","Negotiate: corporate secondment tenants are preferred — mention it"],tip:"Standard lease: 1-year minimum, 1 month deposit + 1 month advance. Negotiate on the advance if you can."},
+  {icon:"BK",bg:"#e0e7ff",tc:"#3730a3",name:"Banking + local setup",when:"Days 1–3",actions:["Open DBS or OCBC — bring EP, passport, service apartment letter as proof of address","EZ-Link card at Changi Airport on arrival — covers MRT + all buses","Local SIM at Changi (Singtel/StarHub/M1) — avoid roaming charges from the first hour","Register SingPass at singpass.gov.sg — takes 1–2 days to activate; do it Day 1","Order rice cooker + 10 kg rice on Lazada SG for next-day delivery to service apartment","Visit Mustafa Centre (Little India, open 24/7) in first 3 days for pantry + household basics"]},
+  {icon:"BC",bg:"#f0fdf4",tc:"#166534",name:"Bicycle for school runs",when:"Decide by Day 14",actions:["Non-folding bike + fixed child seat cannot go in company air freight — oversized item","Option 1 — Buy in SG (recommended): Decathlon SG, bike + child seat from S$200–350","Option 2 — Sea freight from PNH: ~S$100–200, 2–4 weeks, needs professional bike box","Option 3 — Ask HR: check if freight partner accommodates oversized items","LTA rules: bicycles with child seats are allowed on footpaths and park connectors","Confirm secure bike storage at chosen HDB estate before signing the lease"],tip:"If your current bike is mid-range or below, buying new in SG is faster, cheaper, and avoids damage risk."},
+  {icon:"WK",bg:"#f3e8ff",tc:"#6b21a8",name:"New work — Day 1 readiness",when:"Starts Mon 4 May",actions:["Arrive 3 May, drop bags, set up basics — work starts next morning","Confirm Day 1 schedule with Jeff Ang's PA before landing","First 2 weeks are observation and listening — bring a notebook, not a deck","HR onboarding early: payroll setup, system access, benefits enrolment","Your 15/30/60/90-day plan is your compass — trust the structure you built"]},
+  {icon:"TX",bg:"#fce7f3",tc:"#9d174d",name:"Tax equalisation",when:"Schedule consultation by Day 30",actions:["Living cost allowances are taxable under IRAS — gross-up clause is worth negotiating","Ask company to connect you with their tax advisor (EY / PwC / KPMG typical for Prudential)","IRAS residency: 183-day rule for tax resident status applies from arrival","Understand Cambodia–Singapore Double Tax Agreement implications","Keep all receipts: housing allowance, relocation costs, flights — reportable or deductible"],tip:"Don't rely on HR alone. Get an independent advisor in your first month — IRAS penalties for missed filings are real."},
+  {icon:"CA",bg:"#fdf4ff",tc:"#7c3aed",name:"CACS + CPB certification",when:"Paper 1 by Day 25",actions:["Register with IBF (ibf.org.sg) for CACS Paper 1 once EP is activated and SingPass is live","Exam fee ~S$410–490 per paper — unsubsidised as EP holder (IBF-STS subsidies don't apply)","Paper 1: MAS regulations, securities products, ethics","Paper 2 by Day 45: wealth management products, portfolio analysis","CPB Level 1 with WMI requires CACS completion first — contact openprog@wmi.edu.sg for intake dates"]},
+];
+
+// ── Shared state (synced via WebSocket) ─────────────────────────
+let state = { checked: {}, customs: {} };
+let ws, wsReady = false;
+
+function loadCache(){
+  try{ const c=localStorage.getItem('sg_cache'); if(c) state=JSON.parse(c); }catch(e){}
+}
+function saveCache(){
+  try{ localStorage.setItem('sg_cache',JSON.stringify(state)); }catch(e){}
+}
+function applyState(newState){
+  state.checked = newState.checked || {};
+  state.customs  = newState.customs  || {};
+  saveCache();
+  Object.keys(data).forEach(k => makeItems(k, data[k]));
+  updateP();
+}
+function pushState(){
+  saveCache();
+  if(wsReady && ws.readyState===WebSocket.OPEN){
+    ws.send(JSON.stringify({type:'update', checked:state.checked, customs:state.customs}));
+  }
+}
+
+// ── WebSocket ────────────────────────────────────────────────────
+function setStatus(s){
+  const dot=document.getElementById('statusdot');
+  const txt=document.getElementById('statustext');
+  dot.className='dot '+s.dot;
+  txt.textContent=s.label;
+}
+function connectWS(){
+  setStatus({dot:'amber',label:'Connecting…'});
+  const proto = location.protocol==='https:' ? 'wss:' : 'ws:';
+  ws = new WebSocket(proto+'//'+location.host);
+  ws.onopen  = ()=>{ wsReady=true; setStatus({dot:'green',label:'Synced'}); };
+  ws.onclose = ()=>{ wsReady=false; setStatus({dot:'red',label:'Offline (cached)'}); setTimeout(connectWS,4000); };
+  ws.onerror = ()=>{ ws.close(); };
+  ws.onmessage = (e)=>{
+    try{
+      const msg=JSON.parse(e.data);
+      if(msg.type==='init'||msg.type==='sync') applyState(msg);
+    }catch(_){}
+  };
+}
+
+// ── Rendering ────────────────────────────────────────────────────
+function itemHTML(key,text,isCustom,j){
+  const done=!!state.checked[key];
+  const id=isCustom?key.replace('_c_'+j,''):'';
+  return`<div class="item${done?' done':''}${isCustom?' custom':''}" data-key="${key}" onclick="toggle(this)"${isCustom?' style="padding-right:24px"':''}>
+    <div class="cb"><svg class="ck" viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,7 7.5,1.5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <span class="label">${text}</span>
+    ${isCustom?`<button class="del-btn" onclick="delCustom(event,'${id}',${j})" title="Remove">×</button>`:''}
+  </div>`;
+}
+
+function makeItems(id,arr){
+  const el=document.getElementById('d_'+id);
+  if(!el)return;
+  const customs=(state.customs[id])||[];
+  const base=arr.map((item,i)=>{
+    const key=id+'_'+i;
+    if(!(key in state.checked)&&item.c) state.checked[key]=true;
+    return itemHTML(key,item.t+(item.c?'<span class="crit">CRITICAL</span>':''),false,-1);
+  }).join('');
+  const custom=customs.map((item,j)=>itemHTML(id+'_c_'+j,item.t,true,j)).join('');
+  el.innerHTML=base+custom+
+    `<button class="add-trigger" style="grid-column:1/-1" onclick="showAdd('${id}')">+ Add item</button>
+     <div class="add-input-row" id="addinput_${id}">
+       <input class="add-input" id="addinputval_${id}" placeholder="Type item name…" onkeydown="if(event.key==='Enter')commitAdd('${id}');if(event.key==='Escape')hideAdd('${id}')">
+       <button class="add-confirm" onclick="commitAdd('${id}')">Add</button>
+       <button class="add-cancel" onclick="hideAdd('${id}')">Cancel</button>
+     </div>`;
+}
+
+function toggle(el){
+  if(el.tagName==='BUTTON')return;
+  el.classList.toggle('done');
+  state.checked[el.dataset.key]=el.classList.contains('done');
+  pushState(); updateP();
+}
+function showAdd(id){ document.getElementById('addinput_'+id).classList.add('visible'); document.getElementById('addinputval_'+id).focus(); }
+function hideAdd(id){ document.getElementById('addinput_'+id).classList.remove('visible'); document.getElementById('addinputval_'+id).value=''; }
+function commitAdd(id){
+  const inp=document.getElementById('addinputval_'+id);
+  const val=inp.value.trim(); if(!val)return;
+  if(!state.customs[id])state.customs[id]=[];
+  state.customs[id].push({t:val});
+  pushState(); makeItems(id,data[id]||[]); updateP(); hideAdd(id);
+}
+function delCustom(e,id,j){
+  e.stopPropagation();
+  const name=((state.customs[id]||[])[j]||{}).t||'this item';
+  if(!confirm('Remove "'+name+'"?'))return;
+  state.customs[id].splice(j,1);
+  state.customs[id].forEach((_,k)=>{ if(k>=j){ state.checked[id+'_c_'+k]=state.checked[id+'_c_'+(k+1)]; delete state.checked[id+'_c_'+(k+1)]; } });
+  pushState(); makeItems(id,data[id]||[]); updateP();
+}
+function updateP(){
+  [['t1','p1'],['t2','p2']].forEach(([panel,pid])=>{
+    const all=document.querySelectorAll('#'+panel+' .item').length;
+    const done=document.querySelectorAll('#'+panel+' .item.done').length;
+    const pct=all?Math.round(done/all*100):0;
+    document.getElementById(pid+'fill').style.width=pct+'%';
+    document.getElementById(pid+'text').textContent=done+' of '+all+' items ticked off ('+pct+'%)';
+  });
+}
+function renderStreams(){
+  document.getElementById('d_streams').innerHTML=streams.map(s=>`<div class="stream-card"><div class="stream-head"><div class="stream-icon" style="background:${s.bg};color:${s.tc}">${s.icon}</div><div><div class="stream-title">${s.name}</div><div class="stream-when">${s.when}</div></div></div><ul class="action-list">${s.actions.map(a=>'<li>'+a+'</li>').join('')}</ul>${s.tip?'<div class="tip">'+s.tip+'</div>':''}</div>`).join('');
+}
+function go(id){
+  ['t1','t2','t3','t4','t5'].forEach((t,i)=>{ document.querySelectorAll('.tab')[i].classList.toggle('active',t===id); });
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active',p.id===id));
+}
+function resetAll(){
+  if(!confirm('Reset all ticked items and remove custom items?'))return;
+  state={checked:{},customs:{}};
+  pushState();
+  Object.keys(data).forEach(k=>makeItems(k,data[k]));
+  updateP();
+}
+
+// ── Boot ─────────────────────────────────────────────────────────
+loadCache();
+Object.keys(data).forEach(k=>makeItems(k,data[k]));
+renderStreams();
+updateP();
+connectWS();
+</script>
+</body>
+</html>
